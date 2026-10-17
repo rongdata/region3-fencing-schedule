@@ -363,6 +363,73 @@
       color: #ffffff;
     }
 
+    /* Collapsible Past Events Accordion */
+    .past-events-accordion-header {
+      cursor: pointer;
+      user-select: none;
+      background: var(--card-bg) !important;
+      transition: background 0.15s ease;
+    }
+    .past-events-accordion-header:hover {
+      background: var(--table-row-hover) !important;
+    }
+    .past-events-accordion-header td {
+      padding: 14px 18px !important;
+      border-top: 2px dashed var(--border) !important;
+      border-bottom: 2px dashed var(--border) !important;
+    }
+    .past-toggle-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .past-toggle-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .past-toggle-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: rgba(99, 102, 241, 0.15);
+      font-size: 11px;
+      font-weight: bold;
+      color: #818cf8;
+    }
+    .past-toggle-label {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text);
+      letter-spacing: 0.2px;
+    }
+    .past-toggle-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: var(--gray-bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      font-weight: 500;
+    }
+    .past-toggle-hint {
+      font-size: 12px;
+      color: #60a5fa;
+      font-weight: 500;
+    }
+    .past-event-row {
+      opacity: 0.78;
+    }
+    .past-event-row:hover {
+      opacity: 1;
+    }
+
     @media (max-width: 768px) {
       body { padding: 10px; }
       .header-top { flex-direction: column; align-items: flex-start; }
@@ -564,6 +631,58 @@
       return text.includes(searchQuery);
     }
 
+    let pastEventsExpanded = false;
+
+    function togglePastEvents() {
+      pastEventsExpanded = !pastEventsExpanded;
+      renderTable();
+    }
+
+    function createRow(item, isPast) {
+      const tr = document.createElement('tr');
+      if (isPast) {
+        tr.className = 'past-event-row';
+        const isExpanded = pastEventsExpanded || !!searchQuery;
+        if (!isExpanded) {
+          tr.style.display = 'none';
+        }
+      }
+
+      // Status badge
+      let statusBadge = `<span class="badge ${item.badge_class}">${item.status_label}</span>`;
+
+      // Circuit Tag
+      const circuitClass = `circuit-${item.circuit.replace(/[^a-zA-Z]/g, '')}`;
+      const circuitTag = `<span class="circuit-tag ${circuitClass}">${item.circuit}</span>`;
+
+      // Name with link
+      const url = item.registration_url || 'https://member.usafencing.org';
+      const nameLink = `<a href="${url}" target="_blank" class="tourn-name">${item.name}</a>`;
+
+      // Deadlines cell
+      let dueCell = `<span class="due-highlight">${item.due_date_str}</span>`;
+      if (item.late_deadline) {
+        dueCell += `<span class="due-late">🚨 Late Cutoff: ${item.late_deadline}</span>`;
+      }
+
+      const actionBtn = item.registration_url ? `<a href="${item.registration_url}" target="_blank" class="btn-register">Register ↗</a>` : `<span style="color: var(--text-muted); font-size: 11px;">—</span>`;
+
+      tr.innerHTML = `
+        <td>${statusBadge}</td>
+        <td style="white-space: nowrap; font-weight: 500;">${item.dates}</td>
+        <td>${nameLink}</td>
+        <td>${circuitTag}</td>
+        <td>${item.location}</td>
+        <td style="font-family: monospace; font-size: 11px;">${item.match_day || '—'}</td>
+        <td>${item.youth_events}</td>
+        <td>${item.cadet_events}</td>
+        <td>${dueCell}</td>
+        <td style="font-size: 12px; color: var(--text-muted);">${item.notes || '—'}</td>
+        <td>${actionBtn}</td>
+      `;
+      return tr;
+    }
+
     function renderTable() {
       const tbody = document.getElementById('eventsTbody');
       tbody.innerHTML = '';
@@ -592,44 +711,37 @@
         return;
       }
 
-      filtered.forEach(item => {
-        const tr = document.createElement('tr');
+      const upcomingItems = filtered.filter(item => item.status_code !== 'PAST_EVENT');
+      const pastItems = filtered.filter(item => item.status_code === 'PAST_EVENT');
 
-        // Status badge
-        let statusBadge = `<span class="badge ${item.badge_class}">${item.status_label}</span>`;
+      if (currentFilter === 'past') {
+        pastItems.forEach(item => tbody.appendChild(createRow(item, false)));
+        return;
+      }
 
-        // Circuit Tag
-        const circuitClass = `circuit-${item.circuit.replace(/[^a-zA-Z]/g, '')}`;
-        const circuitTag = `<span class="circuit-tag ${circuitClass}">${item.circuit}</span>`;
+      upcomingItems.forEach(item => tbody.appendChild(createRow(item, false)));
 
-        // Name with link
-        const url = item.registration_url || 'https://member.usafencing.org';
-        const nameLink = `<a href="${url}" target="_blank" class="tourn-name">${item.name}</a>`;
-
-        // Deadlines cell
-        let dueCell = `<span class="due-highlight">${item.due_date_str}</span>`;
-        if (item.late_deadline) {
-          dueCell += `<span class="due-late">🚨 Late Cutoff: ${item.late_deadline}</span>`;
-        }
-
-        const actionBtn = item.registration_url ? `<a href="${item.registration_url}" target="_blank" class="btn-register">Register ↗</a>` : `<span style="color: var(--text-muted); font-size: 11px;">—</span>`;
-
-        tr.innerHTML = `
-          <td>${statusBadge}</td>
-          <td style="white-space: nowrap; font-weight: 500;">${item.dates}</td>
-          <td>${nameLink}</td>
-          <td>${circuitTag}</td>
-          <td>${item.location}</td>
-          <td style="font-family: monospace; font-size: 11px;">${item.match_day || '—'}</td>
-          <td>${item.youth_events}</td>
-          <td>${item.cadet_events}</td>
-          <td>${dueCell}</td>
-          <td style="font-size: 12px; color: var(--text-muted);">${item.notes || '—'}</td>
-          <td>${actionBtn}</td>
+      if (pastItems.length > 0) {
+        const isExpanded = pastEventsExpanded || !!searchQuery;
+        const toggleTr = document.createElement('tr');
+        toggleTr.className = 'past-events-accordion-header';
+        toggleTr.onclick = togglePastEvents;
+        toggleTr.innerHTML = `
+          <td colspan="11">
+            <div class="past-toggle-bar">
+              <div class="past-toggle-title-group">
+                <span class="past-toggle-icon">${isExpanded ? '▼' : '▶'}</span>
+                <span class="past-toggle-label">📁 Past / Concluded Tournaments (${pastItems.length})</span>
+                <span class="past-toggle-badge">${isExpanded ? (searchQuery ? 'Auto-Expanded (Search Match)' : 'Expanded') : 'Automatically Collapsed'}</span>
+              </div>
+              <div class="past-toggle-hint">${isExpanded ? 'Tap to collapse ▲' : 'Tap to expand past tournaments ▼'}</div>
+            </div>
+          </td>
         `;
+        tbody.appendChild(toggleTr);
 
-        tbody.appendChild(tr);
-      });
+        pastItems.forEach(item => tbody.appendChild(createRow(item, true)));
+      }
     }
 
     window.onload = init;
