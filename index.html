@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026–2027 Region 3 Fencing Competitions Calendar & Registration Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1d4ed8;
+      --primary-light: #eff6ff;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --green: #10b981;
+      --green-bg: #ecfdf5;
+      --orange: #f59e0b;
+      --orange-bg: #fffbeb;
+      --red: #ef4444;
+      --red-bg: #fef2f2;
+      --blue: #3b82f6;
+      --blue-bg: #eff6ff;
+      --purple: #8b5cf6;
+      --purple-bg: #f5f3ff;
+      --gray-bg: #f1f5f9;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1750px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      margin-bottom: 20px;
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 2px;
+    }
+    .last-updated {
+      font-size: 12px;
+      color: var(--text-muted);
+      background: #ffffff;
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .stat-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Airtable Toolbar */
+    .toolbar {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px 12px 0 0;
+      padding: 14px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .search-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 240px;
+      max-width: 380px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 8px 12px 8px 34px;
+      font-size: 13px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(29,78,216,0.1);
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .pill {
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-muted);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pill:hover {
+      background: var(--gray-bg);
+      color: var(--text);
+    }
+    .pill.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+    .pill-count {
+      background: rgba(0,0,0,0.08);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 10px;
+    }
+    .pill.active .pill-count {
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* Table View */
+    .table-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      overflow-x: auto;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+    th {
+      background: #f8fafc;
+      padding: 12px 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      cursor: pointer;
+      user-select: none;
+    }
+    th:hover {
+      background: #f1f5f9;
+      color: var(--text);
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    tr:hover td {
+      background: #f8fafc;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-orange { background: var(--orange-bg); color: #d97706; }
+    .badge-red { background: var(--red-bg); color: var(--red); }
+    .badge-yellow { background: #fefce8; color: #a16207; border: 1px solid #fef08a; }
+    .badge-amber { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+    .badge-gray { background: var(--gray-bg); color: var(--text-muted); }
+    .badge-neutral { background: #f1f5f9; color: #475569; }
+
+    .circuit-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .circuit-RYC { background: #ede9fe; color: #6d28d9; }
+    .circuit-SYC { background: #fef3c7; color: #b45309; }
+    .circuit-Local { background: #dcfce7; color: #15803d; }
+    .circuit-NAC { background: #e0e7ff; color: #4338ca; }
+    .circuit-Qualifier { background: #ffe4e6; color: #e11d48; }
+
+    .tourn-name {
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      display: inline-block;
+    }
+    .tourn-name:hover {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+
+    .due-highlight {
+      font-weight: 600;
+      color: var(--text);
+    }
+    .due-late {
+      font-size: 11px;
+      color: #b45309;
+      display: block;
+      margin-top: 2px;
+    }
+    .btn-register {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      background: var(--primary-light);
+      border: 1px solid rgba(29,78,216,0.2);
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .btn-register:hover {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 10px; }
+      .header-top { flex-direction: column; align-items: flex-start; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .search-wrapper { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-top">
+        <div>
+          <h1>🤺 Region 3 & National Fencing Competitions Calendar</h1>
+          <p class="subtitle">2026–2027 Season Schedule & Registration Deadlines for Region 3 RYCs, SYCs, NACs, and Sanctioned Epee Events</p>
+        </div>
+        <div class="last-updated">Updated: <strong id="lastSyncTime"></strong></div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Tournaments</div>
+          <div class="stat-value" id="statTotal">--</div>
+          <div class="stat-sub">Tracked 2026–2027 Season</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Deadlines Approaching</div>
+          <div class="stat-value" id="statDeadlines" style="color: #d97706;">--</div>
+          <div class="stat-sub">Due in next 14 days</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Late Fee Active</div>
+          <div class="stat-value" id="statLateFee" style="color: #b45309;">--</div>
+          <div class="stat-sub">Final Cutoff Pending</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Completed Tournaments</div>
+          <div class="stat-value" id="statCompleted">--</div>
+          <div class="stat-sub">Past Event Dates</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search tournaments, cities, categories, dates...">
+      </div>
+
+      <div class="filter-pills" id="filterPills">
+        <button class="pill active" data-filter="all">All <span class="pill-count" id="countAll">0</span></button>
+        <button class="pill" data-filter="action">⚠️ Deadlines Soon <span class="pill-count" id="countAction">0</span></button>
+        <button class="pill" data-filter="syc">⭐ SYC <span class="pill-count" id="countSYC">0</span></button>
+        <button class="pill" data-filter="ryc">🏆 RYC <span class="pill-count" id="countRYC">0</span></button>
+        <button class="pill" data-filter="local">🛡️ Local Sanctioned <span class="pill-count" id="countLocal">0</span></button>
+        <button class="pill" data-filter="nac">🇺🇸 National / NAC <span class="pill-count" id="countNAC">0</span></button>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table id="eventsTable">
+        <thead>
+          <tr>
+            <th data-sort="status">Registration Status ↕</th>
+            <th data-sort="dates">Dates ↕</th>
+            <th data-sort="name">Tournament Name ↕</th>
+            <th data-sort="circuit">Circuit ↕</th>
+            <th data-sort="location">Location ↕</th>
+            <th>Match Day</th>
+            <th>Youth Events (Y10–Y14)</th>
+            <th>Cadet & Junior Events</th>
+            <th data-sort="due">Registration Deadlines ↕</th>
+            <th>Hotel / Logistics</th>
+            <th>Notes</th>
+            <th>Registration</th>
+          </tr>
+        </thead>
+        <tbody id="eventsTbody">
+          <!-- Dynamically rendered -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const DATA = [{"index": 1, "name": "Star Cup RYC/RJCC", "dates": "Sep 5–6, 2026", "start_date": "2026-09-05", "circuit": "RYC", "location": "Danvers, MA", "match_day": "SS", "youth_events": "Y12 & Y14", "cadet_events": "Y14 & Cadet", "regular_deadline": "2026-08-24", "late_deadline": null, "due_date_str": "Passed (Aug 24, 2026)", "hotel": "no hotel needed", "stay": "", "notes": "Completed", "registration_url": "", "status_label": "Completed", "status_code": "COMPLETED", "badge_class": "badge-gray", "days_to_reg": -54, "days_to_late": null}, {"index": 2, "name": "Nittany Lion Cup RYC/RJCC", "dates": "Sep 12–13, 2026", "start_date": "2026-09-12", "circuit": "RYC", "location": "State College, PA", "match_day": "SS", "youth_events": "Y12 & Y14", "cadet_events": "Y14 & Cadet", "regular_deadline": "2026-08-31", "late_deadline": null, "due_date_str": "Passed (Aug 31, 2026)", "hotel": "courtyard state college", "stay": "FS", "notes": "Completed", "registration_url": "", "status_label": "Completed", "status_code": "COMPLETED", "badge_class": "badge-gray", "days_to_reg": -47, "days_to_late": null}, {"index": 3, "name": "Motor City SYC/RCC", "dates": "Sep 18–20, 2026", "start_date": "2026-09-18", "circuit": "SYC", "location": "Waterford, MI", "match_day": "F_S", "youth_events": "Y12 & Y14 (SYC)", "cadet_events": "Y14 (SYC) & Cadet (RCC)", "regular_deadline": "2026-08-24", "late_deadline": null, "due_date_str": "Passed (Aug 24, 2026)", "hotel": "holiday inn waterford", "stay": "TFS", "notes": "$492", "registration_url": "", "status_label": "Completed", "status_code": "COMPLETED", "badge_class": "badge-gray", "days_to_reg": -54, "days_to_late": null}, {"index": 4, "name": "BFC Youth Series 1", "dates": "Sep 18–20, 2026", "start_date": "2026-09-18", "circuit": "Regional", "location": "Boston, MA", "match_day": "SS", "youth_events": "Y12 & Y14", "cadet_events": "Y14", "regular_deadline": "2026-09-14", "late_deadline": null, "due_date_str": "Passed (Sep 14, 2026)", "hotel": "no hotel needed", "stay": "", "notes": "Completed", "registration_url": "", "status_label": "Completed", "status_code": "COMPLETED", "badge_class": "badge-gray", "days_to_reg": -33, "days_to_late": null}, {"index": 5, "name": "Olympia D'Artagnan Challenge 1B (Y14)", "dates": "Sep 20, 2026", "start_date": "2026-09-20", "circuit": "Regional", "location": "Cambridge, MA", "match_day": "_S", "youth_events": "Y14", "cadet_events": "Y14", "regular_deadline": "2026-09-18", "late_deadline": null, "due_date_str": "Passed (Sep 18, 2026)", "hotel": "no hotel needed", "stay": "", "notes": "Completed", "registration_url": "", "status_label": "Completed", "status_code": "COMPLETED", "badge_class": "badge-gray", "days_to_reg": -29, "days_to_late": null}, {"index": 6, "name": "Premier Challenge RYC/RJCC", "dates": "Sep 25–27, 2026", "start_date": "2026-09-25", "circuit": "RYC", "location": "Suffern, NY", "match_day": "FS_", "youth_events": "Y12 & Y14", "cadet_events": "Y14 & Cadet", "regular_deadline": "2026-09-07", "late_deadline": null, "due_date_str": "Passed (Sep 7, 2026)", "hotel": "crowne plaza suffern", "stay": "TFS", "notes": "$531", "registration_url": "", "status_label": "Completed", "status_code": "COMPLETED", "badge_class": "badge-gray", "days_to_reg": -40, "days_to_late": null}, {"index": 7, "name": "SITS Open C & Under", "dates": "Sep 27, 2026", "start_date": "2026-09-27", "circuit": "Regional", "location": "Willimantic, CT", "match_day": "_S", "youth_events": "Div 2 Mixed Epee", "cadet_events": "Div2WE", "regular_deadline": "2026-09-25", "late_deadline": null, "due_date_str": "Passed (Sep 25, 2026)", "hotel": "no hotel needed", "stay": "", "notes": "Completed", "registration_url": "", "status_label": "Completed", "status_code": "COMPLETED", "badge_class": "badge-gray", "days_to_reg": -22, "days_to_late": null}, {"index": 8, "name": "Ben Gutenberg Memorial SYC/RJCC", "dates": "Oct 2–4, 2026", "start_date": "2026-10-02", "circuit": "SYC", "location": "Rochester, NY", "match_day": "FSS", "youth_events": "Y12 (SYC) & Y14 (RJCC)", "cadet_events": "Y14 & Cadet (RJCC)", "regular_deadline": "2026-09-14", "late_deadline": null, "due_date_str": "Passed (Sep 14, 2026)", "hotel": "hyatt regency rochester", "stay": "TFS", "notes": "Completed", "registration_url": "", "status_label": "Completed", "status_code": "COMPLETED", "badge_class": "badge-gray", "days_to_reg": -33, "days_to_late": null}, {"index": 9, "name": "October NAC", "dates": "Oct 9–12, 2026", "start_date": "2026-10-09", "circuit": "NAC", "location": "Orlando, FL", "match_day": "M/F", "youth_events": "Y14", "cadet_events": "Y14 & Cadet", "regular_deadline": "2026-09-02", "late_deadline": "2026-10-08", "due_date_str": "Passed (Sep 2 / Late Oct 8)", "hotel": "no hotel needed", "stay": "", "notes": "Ongoing / National", "registration_url": "", "status_label": "Completed", "status_code": "COMPLETED", "badge_class": "badge-gray", "days_to_reg": -45, "days_to_late": -9}, {"index": 10, "name": "Marx/Vivo Developmental Epee Series @Marx", "dates": "Oct 10, 2026", "start_date": "2026-10-10", "circuit": "AskFRED Local", "location": "Acton, MA", "match_day": "S_", "youth_events": "Unrated Y10 & Y12 Mixed Epee", "cadet_events": "Unrated Y12 & Y14 Mixed Epee", "regular_deadline": "2026-10-07", "late_deadline": null, "due_date_str": "Passed (Oct 7 / Event Day)", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED local", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Completed", "status_code": "COMPLETED", "badge_class": "badge-gray", "days_to_reg": -10, "days_to_late": null}, {"index": 11, "name": "Strength N Honor Youth Practice Tournament", "dates": "Oct 11, 2026", "start_date": "2026-10-11", "circuit": "AskFRED Local", "location": "Simsbury, CT", "match_day": "_S", "youth_events": "Y12 Mixed Epee", "cadet_events": "Mixed Open Epee", "regular_deadline": "2026-10-11", "late_deadline": null, "due_date_str": "Oct 11, 2026 (Event Day)", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED youth practice", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Completed", "status_code": "COMPLETED", "badge_class": "badge-gray", "days_to_reg": -6, "days_to_late": null}, {"index": 12, "name": "Northeast Division U20/U19 JO Qualifier", "dates": "Oct 17, 2026", "start_date": "2026-10-17", "circuit": "Qualifier", "location": "Pawtucket, RI", "match_day": "S_", "youth_events": "Not eligible", "cadet_events": "Junior Women's Epee", "regular_deadline": "2026-10-17", "late_deadline": null, "due_date_str": "Oct 17, 2026", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED / NE Division members only", "registration_url": "https://www.askfred.net/tournaments", "status_label": "⚠️ Due Today (Regular)", "status_code": "DUE_TODAY", "badge_class": "badge-red", "days_to_reg": 0, "days_to_late": null}, {"index": 13, "name": "NEUSFA U17 (Cadet) JO Qualifier", "dates": "Oct 18, 2026", "start_date": "2026-10-18", "circuit": "Qualifier", "location": "Boston, MA", "match_day": "_S", "youth_events": "Not eligible", "cadet_events": "Cadet Women's Epee (CDTWE)", "regular_deadline": "2026-10-17", "late_deadline": null, "due_date_str": "Oct 17, 2026", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED / NEUSFA qualifier for JO", "registration_url": "https://www.askfred.net/tournaments", "status_label": "⚠️ Due Today (Regular)", "status_code": "DUE_TODAY", "badge_class": "badge-red", "days_to_reg": 0, "days_to_late": null}, {"index": 14, "name": "Olympia D'Artagnan's Challenge 2A (Y8/Y12)", "dates": "Oct 18, 2026", "start_date": "2026-10-18", "circuit": "AskFRED Local", "location": "Cambridge, MA", "match_day": "_S", "youth_events": "Unrated Y12 Men's Epee", "cadet_events": "Unrated Y12 Women's Epee", "regular_deadline": "2026-10-16", "late_deadline": null, "due_date_str": "Oct 16, 2026", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED / OFC internal series", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Registration Closed", "status_code": "CLOSED", "badge_class": "badge-gray", "days_to_reg": -1, "days_to_late": null}, {"index": 15, "name": "Morris Cup RYC/RJCC", "dates": "Oct 24–25, 2026", "start_date": "2026-10-24", "circuit": "RYC", "location": "Suffern, NY", "match_day": "SS", "youth_events": "Y12 & Y14", "cadet_events": "Y14 & Cadet", "regular_deadline": "2026-10-05", "late_deadline": "2026-10-22", "due_date_str": "Passed (Oct 5; Late Oct 22)", "hotel": "crowne plaza suffern", "stay": "FS", "notes": "$354 (USA Fencing #12094)", "registration_url": "https://member.usafencing.org/details/tournaments/12094", "status_label": "⏰ Late Fee Active (5d left)", "status_code": "LATE_FEE_ACTIVE", "badge_class": "badge-amber", "days_to_reg": -12, "days_to_late": 5}, {"index": 16, "name": "5th Annual Drew Page Memorial Open", "dates": "Oct 24–25, 2026", "start_date": "2026-10-24", "circuit": "AskFRED Local", "location": "Willimantic, CT", "match_day": "SS", "youth_events": "Y12 Mixed Epee", "cadet_events": "Senior Women's Epee", "regular_deadline": "2026-10-16", "late_deadline": null, "due_date_str": "Oct 16, 2026", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED sanctioned local", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Registration Closed", "status_code": "CLOSED", "badge_class": "badge-gray", "days_to_reg": -1, "days_to_late": null}, {"index": 17, "name": "Ultimate Cup RJCC", "dates": "Oct 31–Nov 1, 2026", "start_date": "2026-10-31", "circuit": "RJCC", "location": "Hillsborough, NJ", "match_day": "SS", "youth_events": "Not eligible", "cadet_events": "Cadet & Junior", "regular_deadline": "2026-10-12", "late_deadline": "2026-10-29", "due_date_str": "Oct 12, 2026 (Late Oct 29)", "hotel": "no hotel needed", "stay": "", "notes": "USA Fencing #12104", "registration_url": "https://member.usafencing.org/details/tournaments/12104", "status_label": "⏰ Late Fee Active (12d left)", "status_code": "LATE_FEE_ACTIVE", "badge_class": "badge-amber", "days_to_reg": -5, "days_to_late": 12}, {"index": 18, "name": "2027 BFC Youth Series 3", "dates": "Oct 31–Nov 1, 2026", "start_date": "2026-10-31", "circuit": "AskFRED Local", "location": "Boston, MA", "match_day": "SS", "youth_events": "Y10 & Y12 Men's Epee", "cadet_events": "Y14 Women's Epee", "regular_deadline": "2026-10-17", "late_deadline": null, "due_date_str": "Oct 17, 2026 (AskFRED)", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED sanctioned youth", "registration_url": "https://www.askfred.net/tournaments", "status_label": "⚠️ Due Today (Regular)", "status_code": "DUE_TODAY", "badge_class": "badge-red", "days_to_reg": 0, "days_to_late": null}, {"index": 19, "name": "Vivo/Marx Epee Developmental Series @Vivo", "dates": "Nov 7, 2026", "start_date": "2026-11-07", "circuit": "AskFRED Local", "location": "Haverhill, MA", "match_day": "S_", "youth_events": "Unrated Y10 & Y12 Mixed Epee", "cadet_events": "Unrated Y12 Mixed Epee", "regular_deadline": "2026-11-04", "late_deadline": null, "due_date_str": "Nov 4, 2026", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED developmental", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (18d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 18, "days_to_late": null}, {"index": 20, "name": "Olympia D'Artagnan's Challenge 2B (Y10/Y14)", "dates": "Nov 7–8, 2026", "start_date": "2026-11-07", "circuit": "AskFRED Local", "location": "Cambridge, MA", "match_day": "_S", "youth_events": "Y10 & Y14 Men's Epee", "cadet_events": "Y10 & Y14 Women's Epee", "regular_deadline": "2026-11-06", "late_deadline": null, "due_date_str": "Nov 6, 2026", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED (Open to all clubs)", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (20d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 20, "days_to_late": null}, {"index": 21, "name": "Pizza RYC/RJCC", "dates": "Nov 14–15, 2026", "start_date": "2026-11-14", "circuit": "RYC", "location": "New Haven, CT", "match_day": "SS", "youth_events": "Y12 & Y14", "cadet_events": "Y14 & Cadet", "regular_deadline": "2026-10-23", "late_deadline": "2026-10-27", "due_date_str": "Oct 23, 2026 (Late Oct 27)", "hotel": "Residence Inn Hamden", "stay": "FS", "notes": "$339 (USA Fencing #12108)", "registration_url": "https://member.usafencing.org/details/tournaments/12108", "status_label": "Due in 6d", "status_code": "DUE_SOON", "badge_class": "badge-yellow", "days_to_reg": 6, "days_to_late": 10}, {"index": 22, "name": "Kiefer Meinhardt Cup SYC/RJCC", "dates": "Nov 14–15, 2026", "start_date": "2026-11-14", "circuit": "SYC", "location": "Richmond, VA", "match_day": "SS", "youth_events": "Y12 & Y14 (SYC)", "cadet_events": "Y14 (SYC) & Cadet (RJCC)", "regular_deadline": "2026-11-01", "late_deadline": "2026-11-13", "due_date_str": "Nov 1, 2026 (Late Nov 13)", "hotel": "no hotel needed", "stay": "", "notes": "USA Fencing #12112", "registration_url": "https://member.usafencing.org/details/tournaments/12112", "status_label": "Open (15d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 15, "days_to_late": 27}, {"index": 23, "name": "November NAC", "dates": "Nov 20–23, 2026", "start_date": "2026-11-20", "circuit": "NAC", "location": "Columbus, OH", "match_day": "M/F", "youth_events": "Not eligible (Junior/Cadet)", "cadet_events": "Cadet Women's Epee", "regular_deadline": "2026-09-23", "late_deadline": "2026-11-19", "due_date_str": "Passed (Sep 23; Late Nov 19)", "hotel": "no hotel needed", "stay": "", "notes": "USA Fencing National", "registration_url": "", "status_label": "⏰ Late Fee Active (33d left)", "status_code": "LATE_FEE_ACTIVE", "badge_class": "badge-amber", "days_to_reg": -24, "days_to_late": 33}, {"index": 24, "name": "NJFA Thanksgiving Div 3 & Y8-Y14 Epee", "dates": "Nov 26, 2026", "start_date": "2026-11-26", "circuit": "AskFRED Local", "location": "Maplewood, NJ", "match_day": "T (Thxgiving)", "youth_events": "Y12 & Y14 Mixed Epee", "cadet_events": "Y14 Mixed & Div 3 Epee", "regular_deadline": "2026-11-24", "late_deadline": null, "due_date_str": "Nov 24, 2026", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED holiday event", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (38d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 38, "days_to_late": null}, {"index": 25, "name": "Cobra Challenge SYC/RCC", "dates": "Nov 27–29, 2026", "start_date": "2026-11-27", "circuit": "SYC", "location": "Secaucus, NJ", "match_day": "F (Thxgiving)", "youth_events": "Y12 & Y14 (SYC)", "cadet_events": "Y14 (SYC) & Cadet (RCC)", "regular_deadline": "2026-11-01", "late_deadline": "2026-11-07", "due_date_str": "Nov 1, 2026 (Late Nov 7)", "hotel": "Hyatt Place Secaucus", "stay": "TFS", "notes": "USA Fencing #12128", "registration_url": "https://member.usafencing.org/details/tournaments/12128", "status_label": "Open (15d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 15, "days_to_late": 21}, {"index": 26, "name": "Olympia D'Artagnan's Challenge 3A (Y8/Y12)", "dates": "Dec 6, 2026", "start_date": "2026-12-06", "circuit": "AskFRED Local", "location": "Cambridge, MA", "match_day": "_S", "youth_events": "Unrated Y12 Men's Epee", "cadet_events": "Unrated Y12 Women's Epee", "regular_deadline": "2026-12-04", "late_deadline": null, "due_date_str": "Dec 4, 2026", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED local", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (48d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 48, "days_to_late": null}, {"index": 27, "name": "Z1 RYC/RJCC", "dates": "Dec 12–13, 2026", "start_date": "2026-12-12", "circuit": "RYC", "location": "Newtown, CT", "match_day": "SS", "youth_events": "Y12 & Y14", "cadet_events": "Y14 & Cadet", "regular_deadline": "2026-12-01", "late_deadline": "2026-12-11", "due_date_str": "Dec 1, 2026 (Late Dec 11)", "hotel": "courtyard danbury", "stay": "FS", "notes": "USA Fencing #12140", "registration_url": "https://member.usafencing.org/details/tournaments/12140", "status_label": "Open (45d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 45, "days_to_late": 55}, {"index": 28, "name": "Boston Fencing Club RYC/RCC", "dates": "Dec 19–20, 2026", "start_date": "2026-12-19", "circuit": "RYC", "location": "Norton, MA", "match_day": "SS", "youth_events": "Y10, Y12 & Y14 Men's Epee", "cadet_events": "Y10, Y14 & Cadet Women's Epee", "regular_deadline": "2026-11-30", "late_deadline": "2026-12-05", "due_date_str": "Nov 30, 2026 (Late Dec 5)", "hotel": "fairfield marriott", "stay": "S", "notes": "$155 (USA Fencing #12147)", "registration_url": "https://member.usafencing.org/details/tournaments/12147", "status_label": "Open (44d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 44, "days_to_late": 49}, {"index": 29, "name": "NEUSFA Jack Norton Hangover Open", "dates": "Jan 1, 2027", "start_date": "2027-01-01", "circuit": "AskFRED Local", "location": "Boston, MA", "match_day": "F (New Year)", "youth_events": "Not eligible", "cadet_events": "Senior Women's Epee", "regular_deadline": "2026-12-18", "late_deadline": null, "due_date_str": "Dec 18, 2026", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED local", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (62d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 62, "days_to_late": null}, {"index": 30, "name": "Junior Olympics (JO) Championships", "dates": "Jan 8–11, 2027", "start_date": "2027-01-08", "circuit": "Qualifier", "location": "Oklahoma City, OK", "match_day": "M/F", "youth_events": "Strategic Rest (Not eligible)", "cadet_events": "Cadet (U17) & Junior (U20)", "regular_deadline": "2026-11-11", "late_deadline": null, "due_date_str": "Nov 11, 2026 (Opens Oct 7)", "hotel": "no hotel needed", "stay": "", "notes": "USA Fencing National / Qual req'd", "registration_url": "", "status_label": "Open (25d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 25, "days_to_late": null}, {"index": 31, "name": "Capitol Clash SYC/RCC", "dates": "Jan 16–18, 2027", "start_date": "2027-01-16", "circuit": "SYC", "location": "Oxon Hill, MD", "match_day": "M (MLK)", "youth_events": "Y12 & Y14 (SYC)", "cadet_events": "Y14 (SYC) & Cadet (RCC)", "regular_deadline": "2026-12-14", "late_deadline": "2027-01-14", "due_date_str": "Dec 14, 2026 (Late Jan 14)", "hotel": "gaylord national harbor", "stay": "FSS", "notes": "$983 (USA Fencing #12224)", "registration_url": "https://member.usafencing.org/details/tournaments/12224", "status_label": "Open (58d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 58, "days_to_late": 89}, {"index": 32, "name": "NEUSFA Epee Open @ Vivo", "dates": "Jan 23, 2027", "start_date": "2027-01-23", "circuit": "AskFRED Local", "location": "Haverhill, MA", "match_day": "S_", "youth_events": "Senior Mixed (if rated)", "cadet_events": "Senior Mixed Epee", "regular_deadline": "2027-01-09", "late_deadline": null, "due_date_str": "Jan 9, 2027", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED senior local", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (84d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 84, "days_to_late": null}, {"index": 33, "name": "Olympia D'Artagnan's Challenge 3B (Y10/Y14)", "dates": "Jan 23–24, 2027", "start_date": "2027-01-23", "circuit": "AskFRED Local", "location": "Cambridge, MA", "match_day": "_S", "youth_events": "Y10 & Y14 Men's Epee", "cadet_events": "Y10 & Y14 Women's Epee", "regular_deadline": "2027-01-22", "late_deadline": null, "due_date_str": "Jan 22, 2027", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED local", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (97d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 97, "days_to_late": null}, {"index": 34, "name": "Wildcat SYC/RCC", "dates": "Jan 30–31, 2027", "start_date": "2027-01-30", "circuit": "SYC", "location": "Libertyville, IL (Chicago area)", "match_day": "SS", "youth_events": "Y10, Y12 & Y14 (SYC)", "cadet_events": "Y12, Y14 (SYC) & Cadet (RCC)", "regular_deadline": "2027-01-04", "late_deadline": null, "due_date_str": "Jan 4, 2027 (Opens Reg 3 Oct 22)", "hotel": "need hotel", "stay": "FS", "notes": "USA Fencing #12238 (Late Jan 25)", "registration_url": "https://member.usafencing.org/details/tournaments/12238", "status_label": "Open (79d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 79, "days_to_late": null}, {"index": 35, "name": "NEUSFA Tom Gorman Beanpot Open", "dates": "Jan 31, 2027", "start_date": "2027-01-31", "circuit": "AskFRED Local", "location": "Boston, MA", "match_day": "_S", "youth_events": "Senior Men's Epee", "cadet_events": "Senior Women's Epee", "regular_deadline": "2026-12-16", "late_deadline": null, "due_date_str": "Dec 16, 2026", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED Senior Open", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (60d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 60, "days_to_late": null}, {"index": 36, "name": "Miles Chamley-Watson Cup RYC/RJCC/ROC", "dates": "Feb 5–7, 2027", "start_date": "2027-02-05", "circuit": "RYC", "location": "Providence, RI", "match_day": "FSS", "youth_events": "Y10, Y12 & Y14 Men's Epee", "cadet_events": "Y10, Y14, Cadet & Junior Epee", "regular_deadline": "2027-01-08", "late_deadline": "2027-02-04", "due_date_str": "Jan 8, 2027 (Late Feb 4)", "hotel": "need hotel", "stay": "", "notes": "USA Fencing #12243 / Easy drive", "registration_url": "https://member.usafencing.org/details/tournaments/12243", "status_label": "Open (83d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 83, "days_to_late": 110}, {"index": 37, "name": "BFC Youth Series 4", "dates": "Feb 13–14, 2027", "start_date": "2027-02-13", "circuit": "AskFRED Local", "location": "Boston, MA", "match_day": "SS", "youth_events": "Y10, Y12 & Y14 Men's Epee", "cadet_events": "Y14 Women's Epee", "regular_deadline": "2027-02-06", "late_deadline": null, "due_date_str": "Feb 6, 2027", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED youth local", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (112d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 112, "days_to_late": null}, {"index": 38, "name": "Vivo/Marx Youth Epee Developmental @Vivo", "dates": "Feb 20–21, 2027", "start_date": "2027-02-20", "circuit": "AskFRED Local", "location": "Haverhill, MA", "match_day": "S_", "youth_events": "Unrated Y10 & Y12 Mixed Epee", "cadet_events": "Unrated Y12 Mixed Epee", "regular_deadline": "2027-02-17", "late_deadline": null, "due_date_str": "Feb 17, 2027", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED youth developmental", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (123d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 123, "days_to_late": null}, {"index": 39, "name": "Olympia D'Artagnan's Challenge 4A (Y8/Y12)", "dates": "Feb 21, 2027", "start_date": "2027-02-21", "circuit": "AskFRED Local", "location": "Cambridge, MA", "match_day": "_S", "youth_events": "Unrated Y12 Men's Epee", "cadet_events": "Unrated Y12 Women's Epee", "regular_deadline": "2027-02-19", "late_deadline": null, "due_date_str": "Feb 19, 2027", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED local", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (125d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 125, "days_to_late": null}, {"index": 40, "name": "Duel of the East Coast RYC/RJCC", "dates": "Feb 26–28, 2027", "start_date": "2027-02-26", "circuit": "RYC", "location": "Phoenixville, PA", "match_day": "FSS", "youth_events": "Y12 & Y14", "cadet_events": "Y14 & Cadet", "regular_deadline": "2027-02-08", "late_deadline": "2027-02-24", "due_date_str": "Feb 8, 2027 (Late Feb 24)", "hotel": "need hotel", "stay": "", "notes": "USA Fencing #12260", "registration_url": "https://member.usafencing.org/details/tournaments/12260", "status_label": "Open (114d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 114, "days_to_late": 130}, {"index": 41, "name": "March NAC", "dates": "Early March 2027", "start_date": "2027-03-20", "circuit": "NAC", "location": "TBD", "match_day": "M/F", "youth_events": "Y12 & Y14", "cadet_events": "Y14 & Division II", "regular_deadline": "2027-01-20", "late_deadline": null, "due_date_str": "TBD (~Jan 2027)", "hotel": "need hotel", "stay": "", "notes": "USA Fencing National", "registration_url": "", "status_label": "Open (95d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 95, "days_to_late": null}, {"index": 42, "name": "Olympia D'Artagnan's Challenge 4B (Y10/Y14)", "dates": "Mar 13–14, 2027", "start_date": "2027-03-13", "circuit": "AskFRED Local", "location": "Cambridge, MA", "match_day": "_S", "youth_events": "Y10 & Y14 Men's Epee", "cadet_events": "Y10 & Y14 Women's Epee", "regular_deadline": "2027-03-12", "late_deadline": null, "due_date_str": "Mar 12, 2027", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED local", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (146d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 146, "days_to_late": null}, {"index": 43, "name": "American Challenge SYC/RJCC", "dates": "Mar 19–21, 2027", "start_date": "2027-03-19", "circuit": "SYC", "location": "Hartford, CT", "match_day": "FSS", "youth_events": "Y12 (SYC) & Y14 (RJCC)", "cadet_events": "Y14 (SYC) & Cadet (RJCC)", "regular_deadline": "2027-03-01", "late_deadline": "2027-03-17", "due_date_str": "Mar 1, 2027 (Late Mar 17)", "hotel": "need hotel", "stay": "", "notes": "USA Fencing #12282 / Direct drive", "registration_url": "https://member.usafencing.org/details/tournaments/12282", "status_label": "Open (135d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 135, "days_to_late": 151}, {"index": 44, "name": "Div 2/3 & Y14 Division Qualifier", "dates": "Mar 21, 2027", "start_date": "2027-03-21", "circuit": "Qualifier", "location": "Rochester, NH", "match_day": "_S", "youth_events": "Y14 Men's Epee (Qualifier)", "cadet_events": "Y14 Women & Div 2/3 Epee (Qual)", "regular_deadline": "2027-03-07", "late_deadline": null, "due_date_str": "Mar 7, 2027", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED NE Division Summer Nat Qual", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (141d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 141, "days_to_late": null}, {"index": 45, "name": "Absolute Foundation RYC/RJCC", "dates": "Mar 26–28, 2027", "start_date": "2027-03-26", "circuit": "RYC", "location": "Atlantic City, NJ", "match_day": "SS", "youth_events": "Y12 & Y14", "cadet_events": "Y14 & Cadet", "regular_deadline": "2027-03-05", "late_deadline": "2027-03-19", "due_date_str": "Mar 5, 2027 (Late Mar 19)", "hotel": "need hotel", "stay": "", "notes": "USA Fencing #12288", "registration_url": "https://member.usafencing.org/details/tournaments/12288", "status_label": "Open (139d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 139, "days_to_late": 153}, {"index": 46, "name": "Olympia D'Artagnan's Challenge 5A (Y8/Y12)", "dates": "Apr 4, 2027", "start_date": "2027-04-04", "circuit": "AskFRED Local", "location": "Cambridge, MA", "match_day": "_S", "youth_events": "Unrated Y12 Men's Epee", "cadet_events": "Unrated Y12 Women's Epee", "regular_deadline": "2027-04-02", "late_deadline": null, "due_date_str": "Apr 2, 2027", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED local", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (167d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 167, "days_to_late": null}, {"index": 47, "name": "Fairfax Challenge SYC/RJCC", "dates": "Apr 9–11, 2027", "start_date": "2027-04-09", "circuit": "SYC", "location": "Virginia Beach, VA", "match_day": "FSS", "youth_events": "Y12 & Y14 (SYC)", "cadet_events": "Y14 (SYC) & Cadet (RJCC)", "regular_deadline": "2027-03-15", "late_deadline": "2027-04-01", "due_date_str": "Mar 15, 2027 (Late Apr 1)", "hotel": "need hotel", "stay": "", "notes": "USA Fencing #12297", "registration_url": "https://member.usafencing.org/details/tournaments/12297", "status_label": "Open (149d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 149, "days_to_late": 166}, {"index": 48, "name": "American Challenge RJCC/RYC", "dates": "Apr 24–25, 2027", "start_date": "2027-04-24", "circuit": "RYC", "location": "Suffern, NY", "match_day": "SS", "youth_events": "Y12 & Y14", "cadet_events": "Y14 & Cadet", "regular_deadline": "2027-04-04", "late_deadline": "2027-04-21", "due_date_str": "Apr 4, 2027 (Late Apr 21)", "hotel": "need hotel", "stay": "", "notes": "USA Fencing #12304", "registration_url": "https://member.usafencing.org/details/tournaments/12304", "status_label": "Open (169d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 169, "days_to_late": 186}, {"index": 49, "name": "Fortune SYC/RJCC", "dates": "Apr 30–May 2, 2027", "start_date": "2027-04-30", "circuit": "SYC", "location": "Anaheim, CA", "match_day": "FSS", "youth_events": "Y12 & Y14 (SYC)", "cadet_events": "Y14 (SYC) & Cadet/Junior (RJCC)", "regular_deadline": "2027-04-15", "late_deadline": "2027-04-29", "due_date_str": "Apr 15, 2027 (Late Apr 29)", "hotel": "need hotel", "stay": "", "notes": "USA Fencing #12306 / Flight req'd", "registration_url": "https://member.usafencing.org/details/tournaments/12306", "status_label": "Open (180d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 180, "days_to_late": 194}, {"index": 50, "name": "Vivo Youth Epee @ Vivo", "dates": "May 1, 2027", "start_date": "2027-05-01", "circuit": "AskFRED Local", "location": "Haverhill, MA", "match_day": "S_", "youth_events": "Y12 Epee", "cadet_events": "Y12 Epee", "regular_deadline": "2027-04-28", "late_deadline": null, "due_date_str": "Apr 28, 2027", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED youth local", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (193d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 193, "days_to_late": null}, {"index": 51, "name": "Olympia D'Artagnan's Challenge 5B (Y10/Y14)", "dates": "May 2, 2027", "start_date": "2027-05-02", "circuit": "AskFRED Local", "location": "Cambridge, MA", "match_day": "_S", "youth_events": "Y10 & Y14 Men's Epee", "cadet_events": "Y10 & Y14 Women's Epee", "regular_deadline": "2027-04-30", "late_deadline": null, "due_date_str": "Apr 30, 2027", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED local", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (195d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 195, "days_to_late": null}, {"index": 52, "name": "Collegiate Cup RJCC", "dates": "May 8–9, 2027", "start_date": "2027-05-08", "circuit": "RJCC", "location": "La Jolla, CA", "match_day": "SS", "youth_events": "Not eligible", "cadet_events": "Cadet & Junior Women's Epee", "regular_deadline": "2027-04-20", "late_deadline": null, "due_date_str": "Apr 20, 2027", "hotel": "need hotel", "stay": "", "notes": "USA Fencing / West coast", "registration_url": "", "status_label": "Open (185d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 185, "days_to_late": null}, {"index": 53, "name": "BFC Youth Series 5", "dates": "May 8–9, 2027", "start_date": "2027-05-08", "circuit": "AskFRED Local", "location": "Boston, MA", "match_day": "SS", "youth_events": "Y10, Y12 & Y14 Men's Epee", "cadet_events": "Y14 Women's Epee", "regular_deadline": "2027-05-01", "late_deadline": null, "due_date_str": "May 1, 2027", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED youth local", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (196d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 196, "days_to_late": null}, {"index": 54, "name": "BFC Youth Championship", "dates": "Jun 26–27, 2027", "start_date": "2027-06-26", "circuit": "AskFRED Local", "location": "Boston, MA", "match_day": "SS", "youth_events": "Y10, Y12 & Y14 Men's Epee", "cadet_events": "Y14 Women's Epee", "regular_deadline": "2027-06-19", "late_deadline": null, "due_date_str": "Jun 19, 2027", "hotel": "no hotel needed", "stay": "", "notes": "AskFRED youth season finale", "registration_url": "https://www.askfred.net/tournaments", "status_label": "Open (245d left)", "status_code": "OPEN", "badge_class": "badge-neutral", "days_to_reg": 245, "days_to_late": null}];
+
+    let currentFilter = 'all';
+    let searchQuery = '';
+    let sortColumn = 'dates';
+    let sortDirection = 'asc';
+
+    function init() {
+      document.getElementById('lastSyncTime').innerText = new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+      setupEventListeners();
+      renderStats();
+      renderTable();
+    }
+
+    function setupEventListeners() {
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        searchQuery = e.target.value.toLowerCase().trim();
+        renderTable();
+      });
+
+      document.querySelectorAll('.filter-pills .pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.filter-pills .pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentFilter = btn.getAttribute('data-filter');
+          renderTable();
+        });
+      });
+
+      document.querySelectorAll('th[data-sort]').forEach(th => {
+        th.addEventListener('click', () => {
+          const col = th.getAttribute('data-sort');
+          if (sortColumn === col) {
+            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+          } else {
+            sortColumn = col;
+            sortDirection = 'asc';
+          }
+          renderTable();
+        });
+      });
+    }
+
+    function renderStats() {
+      const total = DATA.length;
+      const deadlines = DATA.filter(d => ['DUE_TODAY', 'DUE_CRITICAL', 'DUE_SOON'].includes(d.status_code)).length;
+      const lateFee = DATA.filter(d => d.status_code === 'LATE_FEE_ACTIVE').length;
+      const completed = DATA.filter(d => d.status_code === 'COMPLETED').length;
+
+      document.getElementById('statTotal').innerText = total;
+      document.getElementById('statDeadlines').innerText = deadlines;
+      document.getElementById('statLateFee').innerText = lateFee;
+      document.getElementById('statCompleted').innerText = completed;
+
+      document.getElementById('countAll').innerText = total;
+      document.getElementById('countAction').innerText = deadlines + lateFee;
+      document.getElementById('countSYC').innerText = DATA.filter(d => d.circuit === 'SYC').length;
+      document.getElementById('countRYC').innerText = DATA.filter(d => d.circuit === 'RYC').length;
+      document.getElementById('countLocal').innerText = DATA.filter(d => d.circuit === 'AskFRED Local' || d.circuit === 'Local').length;
+      document.getElementById('countNAC').innerText = DATA.filter(d => d.circuit === 'NAC' || d.circuit === 'Qualifier').length;
+    }
+
+    function matchesFilter(item) {
+      if (currentFilter === 'action') {
+        return ['DUE_TODAY', 'DUE_CRITICAL', 'DUE_SOON', 'LATE_FEE_ACTIVE'].includes(item.status_code);
+      }
+      if (currentFilter === 'syc') return item.circuit === 'SYC';
+      if (currentFilter === 'ryc') return item.circuit === 'RYC';
+      if (currentFilter === 'local') return item.circuit === 'AskFRED Local' || item.circuit === 'Local';
+      if (currentFilter === 'nac') return item.circuit === 'NAC' || item.circuit === 'Qualifier';
+      return true;
+    }
+
+    function matchesSearch(item) {
+      if (!searchQuery) return true;
+      const text = [item.name, item.location, item.dates, item.youth_events, item.cadet_events, item.notes, item.due_date_str].join(' ').toLowerCase();
+      return text.includes(searchQuery);
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('eventsTbody');
+      tbody.innerHTML = '';
+
+      let filtered = DATA.filter(item => matchesFilter(item) && matchesSearch(item));
+
+      filtered.sort((a, b) => {
+        let valA = a[sortColumn] || '';
+        let valB = b[sortColumn] || '';
+
+        if (sortColumn === 'due') {
+          valA = a.regular_deadline || '9999-99-99';
+          valB = b.regular_deadline || '9999-99-99';
+        } else if (sortColumn === 'dates') {
+          valA = a.start_date || a.dates;
+          valB = b.start_date || b.dates;
+        }
+
+        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; padding: 40px; color: var(--text-muted);">No tournaments match the selected criteria.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const tr = document.createElement('tr');
+
+        // Status badge
+        let statusBadge = `<span class="badge ${item.badge_class}">${item.status_label}</span>`;
+
+        // Circuit Tag
+        const circuitClass = `circuit-${item.circuit.replace(/[^a-zA-Z]/g, '')}`;
+        const circuitTag = `<span class="circuit-tag ${circuitClass}">${item.circuit}</span>`;
+
+        // Name with link
+        const url = item.registration_url || 'https://member.usafencing.org';
+        const nameLink = `<a href="${url}" target="_blank" class="tourn-name">${item.name}</a>`;
+
+        // Deadlines cell
+        let dueCell = `<span class="due-highlight">${item.due_date_str}</span>`;
+        if (item.late_deadline) {
+          dueCell += `<span class="due-late">🚨 Late Cutoff: ${item.late_deadline}</span>`;
+        }
+
+        const hotelText = item.hotel ? (item.stay ? `${item.hotel} (${item.stay})` : item.hotel) : '—';
+        const actionBtn = item.registration_url ? `<a href="${item.registration_url}" target="_blank" class="btn-register">Register ↗</a>` : `<span style="color: var(--text-muted); font-size: 11px;">—</span>`;
+
+        tr.innerHTML = `
+          <td>${statusBadge}</td>
+          <td style="white-space: nowrap; font-weight: 500;">${item.dates}</td>
+          <td>${nameLink}</td>
+          <td>${circuitTag}</td>
+          <td>${item.location}</td>
+          <td style="font-family: monospace; font-size: 11px;">${item.match_day || '—'}</td>
+          <td>${item.youth_events}</td>
+          <td>${item.cadet_events}</td>
+          <td>${dueCell}</td>
+          <td>${hotelText}</td>
+          <td style="font-size: 12px; color: var(--text-muted);">${item.notes || '—'}</td>
+          <td>${actionBtn}</td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
